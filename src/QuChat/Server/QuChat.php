@@ -13,6 +13,7 @@ class QuChat implements MessageComponentInterface {
     protected $db;
 
     public function __construct() {
+
         $this->db      = new QuChatMapper();
         $this->clients = new \SplObjectStorage;
     }

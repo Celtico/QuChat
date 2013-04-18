@@ -14,7 +14,6 @@ class QuChatController extends AbstractActionController
 {
     public function indexAction()
     {
-
     }
     public function listAction()
     {

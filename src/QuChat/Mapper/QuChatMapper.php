@@ -4,12 +4,10 @@ namespace QuChat\Mapper;
 
 use QuChat\Db\Adapter\DbAdapterAwareInterface;
 
-use Zend\Db\ResultSet\HydratingResultSet;
-use Zend\Db\Sql\Predicate;
 use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Select;
-use Zend\Db\Sql\Sql;
 use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\Sql\Predicate;
+use Zend\Db\Sql\Sql;
 use Zend\Stdlib\Hydrator\Reflection as ReflectionHydrator;
 use Zend\Paginator\Paginator;
 
@@ -113,8 +111,22 @@ class QuChatMapper  implements DbAdapterAwareInterface
 
     public function getDbAdapter()
     {
-        return $this->dbAdapter;
+        if(!$this->dbAdapter){
+
+
+            $this->setDbAdapter(new Adapter(array(
+                'driver' => 'Pdo',
+                'dsn'            => 'mysql:dbname=qumodules;hostname=localhost',
+                'username'       => 'root',
+                'password'       => 'estacio8',
+                //'username'       => 'myqumodule',
+                //'password'       => 'P6kLb0ct',
+            )));
+
+        }
+        return  $this->dbAdapter;
     }
+
     public function setDbAdapter(Adapter $dbAdapter)
     {
         $this->dbAdapter = $dbAdapter;
