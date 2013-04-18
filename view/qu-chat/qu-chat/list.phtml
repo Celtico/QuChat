@@ -1,0 +1,48 @@
+
+
+<div class="chat-list" id="0" data-resource="0" data-name="name">
+
+  <a class="all-users" id="0" data-resource="0" data-name="name" style="color:#333">All</a>
+
+    <?php foreach($listUsers as $user){ ?>
+
+       <a  id="<?php echo $user['id_user'] ?>" class="<?php echo $user['id_resource'] ?>"   data-name="<?php echo $user['name'] ?>"  data-resource="<?php echo $user['id_resource'] ?>" >
+           <?php echo str_replace(' ','',$user['name']) ?>
+       </a>
+
+    <? } ?>
+
+</div>
+
+<script>
+
+    WChat();
+
+    function WChat(){
+
+        var chatList  = $('.chat-list');
+
+        chatList.find(" a." + $('.chat-pos').attr('data-resource')).css('font-weight','bold');
+
+        chatList.find('a').click(function() {
+
+            chatList.find('a').css('color','');
+            $(this).css('color','#333');
+
+            log('click');
+
+            var id       =  $(this).attr('id');
+            var resource =  $(this).attr('data-resource');
+            var name     =  $(this).attr('data-name');
+
+            chatList.attr('id',id);
+            chatList.attr('data-resource',resource);
+            chatList.attr('data-name',name);
+
+            return  resource;
+        });
+
+        return  chatList.attr('data-resource');
+    }
+
+</script>

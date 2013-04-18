@@ -1,0 +1,31 @@
+{
+    "name": "qu-modules/qu-chat",
+    "description": "ZF2 Module for QuChat",
+    "type": "module",
+    "version":"0.0.1-dev",
+    "keywords": ["icomoon","zf2","module"],
+    "homepage": "https://github.com/Celtico/QuChat",
+    "license": "BSD-3-Clause",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "authors": [
+        {
+            "name": "Cel Ticó Petit",
+            "email": "cel@cenics.net",
+            "homepage": "http://www.cenics.cat",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "cel@cenics.net"
+    },
+    "autoload": {
+        "psr-0": {
+            "QuChat": "src/"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
+    }
+}
