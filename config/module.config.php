@@ -20,16 +20,6 @@ return array(
 
     'router' => array(
         'routes' => array(
-            'server' => array(
-                'type'    => 'hostname',
-                'options' => array(
-                    'route' => 'server',
-                    'defaults' => array(
-                        'controller'    => 'qu_chat_controller',
-                        'action'        => 'server',
-                    ),
-                ),
-            ),
             'qu_chat_route' => array(
                 'type'    => 'segment',
                 'options' => array(
@@ -54,29 +44,6 @@ return array(
     /**
      *
      *
-     * QuAdmin Navigation
-     *
-     *
-     */
-    'navigation' => array(
-        'qu_admin_navigation' => array(
-            'system' => array(
-                'pages' => array(
-                    'qu_chat' => array(
-                        'order' =>3,
-                        'icon'   =>'&#xe1f0',
-                        'label' => 'Chat',
-                        'route' => 'qu_chat_route',
-                    ),
-
-                ),
-            ),
-        ),
-    ),
-
-    /**
-     *
-     *
      * QuAdmin Strategy
      *
      *
@@ -94,7 +61,7 @@ return array(
 
         // NAMESPACE Redirect login
         'QuRedirectLogin' => array(
-            'QuChat' => true
+            //'QuChat' => true
         ),
     ),
 

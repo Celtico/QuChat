@@ -2,26 +2,21 @@
 
 <?php foreach($messages as $message){ ?>
 
-
     <?php if($id_user == $message['id_user']){ ?>
 
-        <?php  echo strftime("%k:%M:%S", strtotime($message['date']));  ?>
-        <strong>
-            <?php  echo $message['name'] ?>
-        </strong>:
-        <?php echo $message['message'] ?>
-        <br>
+        <span class="chat-send-local">
+            <span class="chat-date"><?php echo strftime("%k:%M:%S", strtotime($message['date'])); ?></span>
+            <span class="chat-name"><?php echo $message['name'] ?></span>
+            <span class="chat-message"><?php echo $message['message'] ?></span>
+        </span>
 
     <? }elseif($id_user  == $message['id_user_parent'] || $message['id_user_parent'] == 0 ){ ?>
 
-        <span class="userC">
-            <?php  echo strftime("%k:%M:%S", strtotime($message['date']));  ?>
-            <strong>
-                <?php  echo $message['name'] ?>
-            </strong>:
-            <?php echo $message['message'] ?>
+        <span class="chat-send">
+            <span class="chat-date"><?php echo strftime("%k:%M:%S", strtotime($message['date'])); ?></span>
+            <span class="chat-name"><?php echo $message['name'] ?></span>
+            <span class="chat-message"><?php echo $message['message'] ?></span>
         </span>
-        <br>
 
     <? } ?>
 
