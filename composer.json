@@ -7,7 +7,9 @@
     "homepage": "https://github.com/Celtico/QuChat",
     "license": "BSD-3-Clause",
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "cboden/Ratchet" :  "dev-master",
+        "zendframework/zend-db":  "dev-master"
     },
     "authors": [
         {

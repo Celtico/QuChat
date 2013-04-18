@@ -119,7 +119,6 @@ class QuChatMapper  implements DbAdapterAwareInterface
                 'dsn'            => 'mysql:dbname=qumodules;hostname=localhost',
                 'username'       => 'root',
                 'password'       => 'estacio8',
-
             )));
 
         }
