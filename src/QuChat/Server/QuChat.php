@@ -5,7 +5,6 @@ namespace QuChat\Server;
 use QuChat\Mapper\QuChatMapper;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
-use Ratchet\Wamp;
 
 class QuChat implements MessageComponentInterface {
 
@@ -13,6 +12,7 @@ class QuChat implements MessageComponentInterface {
     protected $db;
 
     public function __construct() {
+
         $this->db      = new QuChatMapper();
         $this->clients = new \SplObjectStorage;
     }
@@ -21,6 +21,8 @@ class QuChat implements MessageComponentInterface {
         $this->clients->attach($conn);
 
         $id_chat = $this->db->onInsert( array('id_resource'=>$conn->resourceId,'date'=>date("Y-m-d H:i:s")));
+        //$this->log(true,'onOpen Insert DATA');
+
         $data =  array(
             'type'           => 'onOpen',
             'id_resource'    => $conn->resourceId,
@@ -29,10 +31,14 @@ class QuChat implements MessageComponentInterface {
         );
 
         $conn->send(json_encode($data));
-        $this->log(true,'onOpen Insert DATA SEND');
+        //$this->log(true,'onOpen SEND');
 
     }
     public function onMessage(ConnectionInterface $from, $msg){
+
+
+
+        $send = false;
 
 
         list($typeMessage,$name,$id_user,$id_resource,$id_parent,$name_parent,$id_resource_parent,$message) = explode('|',$msg);
@@ -41,19 +47,24 @@ class QuChat implements MessageComponentInterface {
 
             //data
             $updateNewUser = $this->updateNewUser($id_user,$name,$id_parent);
-            $this->log($updateNewUser,'updateNewUser onOpen DATA');
+            //$this->log($updateNewUser,'updateNewUser onOpen DATA');
 
             if($updateNewUser){
 
                 //data
                 $saveSendListUsers = $this->saveListUsers($this->clients);
-                $this->log($saveSendListUsers,'saveSendListUsers onOpen DATA');
+                //$this->log($saveSendListUsers,'saveSendListUsers onOpen DATA');
 
                 if($saveSendListUsers){
 
                     //send
                     $sendNewUsers = $this->sendNewUsers($this->clients);
-                    $this->log($sendNewUsers,'sendNewUsers onOpen SEND');
+                    //$this->log($sendNewUsers,'sendNewUsers onOpen SEND');
+
+
+                    $send = true;
+
+
                 }
             }
 
@@ -61,29 +72,59 @@ class QuChat implements MessageComponentInterface {
 
             //data
             $sendMessageUser = $this->saveMessageUser($name,$id_user,$id_resource,$id_parent,$name_parent,$id_resource_parent,$message);
-            $this->log($sendMessageUser,'saveMessageUser onMessage DATA');
+            //$this->log($sendMessageUser,'saveMessageUser onMessage DATA');
 
             if($sendMessageUser){
 
                 //send
                 $sendMessageOneUser = $this->sendMessageOneUser($this->clients,$from,$name,$message,$id_resource_parent);
-                $this->log($sendMessageOneUser,'sendMessageOneUser onMessage SEND');
+                //$this->log($sendMessageOneUser,'sendMessageOneUser onMessage SEND');
+
+
+                $send = true;
+
 
                 if(!$sendMessageOneUser){
 
                     //send
                     $sendMessageToUsers = $this->sendMessageToUsers($this->clients,$from,$name,$message);
-                    $this->log($sendMessageToUsers ,'sendMessageToUsers onMessage SEND');
+                    //$this->log($sendMessageToUsers ,'sendMessageToUsers onMessage SEND');
+
+
+                    $send = true;
+
 
                 }
             }
         }
+
+
+
+        //if not send, try again
+        if(!$send){
+            foreach($this->clients as $client){
+                if($from === $client){
+
+                    $data =  array(
+                        'type'      => 'onMessage',
+                        'date'      => $this->dateFormat(date("Y-m-d H:i:s")),
+                        'name'      => $name,
+                        'message'   => 'not sent, try again'
+                    );
+                    //$this->log(json_encode($data) ,'sendMessageToUsers DATA-SEND');
+                    $client->send(json_encode($data));
+                }
+            }
+        }
+
+
+
     }
 
 
 
 
-/*SEND*/
+    /*SEND*/
 
 
 
@@ -102,7 +143,7 @@ class QuChat implements MessageComponentInterface {
                 'type'=>'listUsers',
                 'usersCount' => count($clients),
             );
-            $this->log(json_encode($data) ,'sendNewUsers DATA-SEND');
+            //$this->log(json_encode($data) ,'sendNewUsers DATA-SEND');
             $client->send(json_encode($data));
         }
         return true;
@@ -130,7 +171,7 @@ class QuChat implements MessageComponentInterface {
                     'message'   => $message
                 );
                 if($from !== $client){
-                    $this->log(json_encode($data) ,'sendMessageOneUser DATA-SEND');
+                    // $this->log(json_encode($data) ,'sendMessageOneUser DATA-SEND');
                     $client->send(json_encode($data));
                 }
                 return true;
@@ -160,7 +201,7 @@ class QuChat implements MessageComponentInterface {
                     'name'      => $name,
                     'message'   => $message
                 );
-                $this->log(json_encode($data) ,'sendMessageToUsers DATA-SEND');
+                //$this->log(json_encode($data) ,'sendMessageToUsers DATA-SEND');
                 $client->send(json_encode($data));
             }
         }
@@ -172,7 +213,7 @@ class QuChat implements MessageComponentInterface {
 
 
 
-/*DATA*/
+    /*DATA*/
 
 
 
@@ -279,8 +320,8 @@ class QuChat implements MessageComponentInterface {
 
 
     protected function log($data,$position){
-        //echo "\n".$position."\n";
-        //var_dump($data);
+        echo "\n".$position."\n";
+        var_dump($data);
     }
 
 
