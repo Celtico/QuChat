@@ -8,8 +8,7 @@
     "license": "BSD-3-Clause",
     "require": {
         "php": ">=5.3.3",
-        "cboden/Ratchet" :  "dev-master",
-        "zendframework/zend-db":  "dev-master"
+        "cboden/Ratchet" :  "dev-master"
     },
     "authors": [
         {
