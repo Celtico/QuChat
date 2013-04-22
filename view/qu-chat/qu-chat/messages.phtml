@@ -1,24 +1,33 @@
-
-
 <?php foreach($messages as $message){ ?>
 
     <?php if($id_user == $message['id_user']){ ?>
 
         <span class="chat-send-local">
-            <span class="chat-date"><?php echo strftime("%k:%M:%S", strtotime($message['date'])); ?></span>
-            <span class="chat-name"><?php echo $message['name'] ?></span>
+            <span class="chat-date">
+                <?php echo strftime("%k:%M:%S", strtotime($message['date'])); ?>
+                <span class="iconb" data-icon=&#xe205;></span>
+            </span>
+            <span class="chat-name">
+                <span class="iconb" data-icon=&#xe1e0;></span>
+                <?php echo $message['name'] ?>
+            </span>
             <span class="chat-message"><?php echo $message['message'] ?></span>
         </span>
 
     <? }elseif($id_user  == $message['id_user_parent'] || $message['id_user_parent'] == 0 ){ ?>
 
         <span class="chat-send">
-            <span class="chat-date"><?php echo strftime("%k:%M:%S", strtotime($message['date'])); ?></span>
-            <span class="chat-name"><?php echo $message['name'] ?></span>
+            <span class="chat-date">
+                <?php echo strftime("%k:%M:%S", strtotime($message['date'])); ?>
+                <span class="iconb" data-icon=&#xe205;></span>
+            </span>
+            <span class="chat-name">
+                <span class="iconb" data-icon=&#xe1e0;></span>
+                <?php echo $message['name'] ?>
+            </span>
             <span class="chat-message"><?php echo $message['message'] ?></span>
         </span>
 
     <? } ?>
 
 <? } ?>
-

@@ -2,12 +2,12 @@
 
 <div class="chat-list" id="0" data-resource="0" data-name="name">
 
-  <a class="all-users" id="0" data-resource="0" data-name="name" style="color:#333">All</a>
+  <a class="all-users" id="0" data-resource="0" data-name="name" style="color:#333"><span class='iconb' data-icon=&#xe1e1;></span> All</a>
 
     <?php foreach($listUsers as $user){ ?>
 
        <a  id="<?php echo $user['id_user'] ?>" class="<?php echo $user['id_resource'] ?>"   data-name="<?php echo $user['name'] ?>"  data-resource="<?php echo $user['id_resource'] ?>" >
-           <?php echo str_replace(' ','',$user['name']) ?>
+           <span class='iconb' data-icon=&#xe1e0;></span> <?php echo str_replace(' ','',$user['name']) ?>
        </a>
 
     <? } ?>
@@ -22,12 +22,12 @@
 
         var chatList  = $('.chat-list');
 
-        chatList.find(" a." + $('.chat-pos').attr('data-resource')).css('font-weight','bold');
+        chatList.find(" a." + $('.chat-pos').attr('data-resource')).addClass('im');
 
         chatList.find('a').click(function() {
 
-            chatList.find('a').css('color','');
-            $(this).css('color','#333');
+            chatList.find('a').removeClass('active');
+            $(this).addClass('active');
 
             log('click');
 
