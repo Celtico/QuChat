@@ -37,6 +37,20 @@ class QuChatMapper  implements DbAdapterAwareInterface
         return $result;
     }
 
+    public function getRow($array = array(),$order = null)
+    {
+        $this->Order($order);
+        $this->where($array);
+        return $this->row();
+    }
+
+    public function getAll($array = array(),$order = null)
+    {
+        $this->Order($order);
+        $this->where($array);
+        return $this->all();
+    }
+
     public  function onInsert($data)
     {
         $sql       = new Sql($this->getDbAdapter());
@@ -111,17 +125,6 @@ class QuChatMapper  implements DbAdapterAwareInterface
 
     public function getDbAdapter()
     {
-        if(!$this->dbAdapter){
-
-
-            $this->setDbAdapter(new Adapter(array(
-                'driver' => 'Pdo',
-                'dsn'            => 'mysql:dbname=qumodules;hostname=localhost',
-                'username'       => 'root',
-                'password'       => 'estacio8',
-            )));
-
-        }
         return  $this->dbAdapter;
     }
 

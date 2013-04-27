@@ -12,7 +12,7 @@
     use Ratchet\Wamp;
     use React\EventLoop\Factory;
     use React\Socket\Server as Reactor;
-    use QuChat\Server\QuChat;
+    use QuChat\Server\QuChatNoData;
 
     $loop    = Factory::create();
     $webSock = new Reactor($loop);
@@ -24,6 +24,6 @@
         echo 'Message: ' .$e->getMessage();
     }
 
-    $webServer = new IoServer(new WsServer(new QuChat()),$webSock);
+    $webServer = new IoServer(new WsServer(new QuChatNoData()),$webSock);
 
     $loop->run();

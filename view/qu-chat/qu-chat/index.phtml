@@ -1,0 +1,35 @@
+<ul class="tooltip-user">
+    <li>
+        <a class="chat"  data-toggle="tooltip" data-placement="top" title="Chat">
+            <span class="numConnect" data-target="0">0</span>
+            <span class="iconb" data-icon="&#xe1f0;"></span>
+            <!-- Chat -->
+        </a>
+    </li>
+</ul>
+
+
+
+
+<div class="chat-pos" id="<?php echo $this->qu_admin_user_id() ?>" data-resource="" data-name="<?php echo $this->zfcUserDisplayName() ?>">
+
+    <button type="button" class="close-chat">×</button>
+    <h5 class="ui-widget-header">
+        <span class='iconb' data-icon=&#xe1f0;></span>Chat
+    </h5>
+    <div class="mChat">
+
+    </div>
+    <label class="label-textChat">
+        <input type="text" value="" class="textChat" style="float:left;">
+        <a class="btn chat-btn"><span class="iconb" data-icon="&#xe241;"></span></a>
+    </label>
+    <div id="userActive"></div>
+    <div class="list-chat"></div>
+
+</div>
+
+<?php  $this->headLink()->prependStylesheet($this->basePath() . '/css/chat.css'); ?>
+<?php  $this->inlineScript()->prependFile($this->basePath() . '/js/chatNoData.js', 'text/javascript'); ?>
+<?php  $this->inlineScript()->prependFile($this->basePath() . '/js/jquery-ui.min-1.8.js', 'text/javascript'); ?>
+<?php  $this->inlineScript()->prependFile($this->basePath() . '/js/jquery-1.8.1.min.js', 'text/javascript'); ?>

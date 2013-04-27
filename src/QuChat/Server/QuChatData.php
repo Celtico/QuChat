@@ -6,7 +6,7 @@ use QuChat\Mapper\QuChatMapper;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
-class QuChat implements MessageComponentInterface {
+class QuChatData implements MessageComponentInterface {
 
     protected $clients;
     protected $db;
@@ -20,11 +20,9 @@ class QuChat implements MessageComponentInterface {
 
         $this->clients->attach($conn);
 
+        $id_chat = $this->db->onInsert( array('id_resource'=>$conn->resourceId,'date'=>date("Y-m-d H:i:s")));
+        $this->log(true,'onOpen Insert DATA');
 
-        //$id_chat = $this->db->onInsert( array('id_resource'=>$conn->resourceId,'date'=>date("Y-m-d H:i:s")));
-        //$this->log(true,'onOpen Insert DATA');
-
-        $id_chat = '';
         $data =  array(
             'type'           => 'onOpen',
             'id_resource'    => $conn->resourceId,
@@ -38,56 +36,54 @@ class QuChat implements MessageComponentInterface {
     }
     public function onMessage(ConnectionInterface $from, $msg){
 
-
         list($typeMessage,$name,$id_user,$id_resource,$id_parent,$name_parent,$id_resource_parent,$message) = explode('|',$msg);
 
         if($typeMessage == 'onOpen'){
 
             //data
-            //$updateNewUser = $this->updateNewUser($id_user,$name,$id_parent);
-            //$this->log($updateNewUser,'updateNewUser onOpen DATA');
+            $updateNewUser = $this->updateNewUser($id_user,$name,$id_parent);
+            $this->log($updateNewUser,'updateNewUser onOpen DATA');
 
-            //if($updateNewUser){
+            if($updateNewUser){
 
                 //data
-                //$saveSendListUsers = $this->saveListUsers($this->clients);
-                //$this->log($saveSendListUsers,'saveSendListUsers onOpen DATA');
+                $saveSendListUsers = $this->saveListUsers($this->clients);
+                $this->log($saveSendListUsers,'saveSendListUsers onOpen DATA');
 
-                //if($saveSendListUsers){
+                if($saveSendListUsers){
 
                     //send
                     $sendNewUsers = $this->sendNewUsers($this->clients);
                     $this->log($sendNewUsers,'sendNewUsers onOpen SEND');
-                //}
-            //}
+                }
+            }
 
         }elseif($typeMessage == 'onMessage'){
 
             //data
-            //$sendMessageUser = $this->saveMessageUser($name,$id_user,$id_resource,$id_parent,$name_parent,$id_resource_parent,$message);
-            //$this->log($sendMessageUser,'saveMessageUser onMessage DATA');
+            $sendMessageUser = $this->saveMessageUser($name,$id_user,$id_resource,$id_parent,$name_parent,$id_resource_parent,$message);
+            $this->log($sendMessageUser,'saveMessageUser onMessage DATA');
 
-            //if($sendMessageUser){
+            if($sendMessageUser){
 
                 //send
-                //$sendMessageOneUser = $this->sendMessageOneUser($this->clients,$from,$name,$message,$id_resource_parent);
-                //$this->log($sendMessageOneUser,'sendMessageOneUser onMessage SEND');
+                $sendMessageOneUser = $this->sendMessageOneUser($this->clients,$from,$name,$message,$id_resource_parent);
+                $this->log($sendMessageOneUser,'sendMessageOneUser onMessage SEND');
 
-                //if(!$sendMessageOneUser){
+                if(!$sendMessageOneUser){
 
                     //send
                     $sendMessageToUsers = $this->sendMessageToUsers($this->clients,$from,$name,$message);
                     $this->log($sendMessageToUsers ,'sendMessageToUsers onMessage SEND');
-
-                //}
-            //}
+                }
+            }
         }
     }
 
 
 
 
-/*SEND*/
+    /*SEND*/
 
 
 
@@ -100,7 +96,8 @@ class QuChat implements MessageComponentInterface {
      * @param $clients
      * @return bool
      */
-    protected function sendNewUsers($clients) {
+    protected function sendNewUsers($clients){
+
         foreach($clients as $client){
             $data =  array(
                 'type'=>'listUsers',
@@ -176,7 +173,7 @@ class QuChat implements MessageComponentInterface {
 
 
 
-/*DATA*/
+    /*DATA*/
 
 
 
@@ -229,7 +226,6 @@ class QuChat implements MessageComponentInterface {
                 'message'       =>'listUsers',
 
             );
-
         }
 
         $this->db->onRemove(array('message'=>'updateNewUser'));
@@ -283,8 +279,8 @@ class QuChat implements MessageComponentInterface {
 
 
     protected function log($data,$position){
-       echo "\n".$position."\n";
-       var_dump($data);
+        //echo "\n".$position."\n";
+        //var_dump($data);
     }
 
 

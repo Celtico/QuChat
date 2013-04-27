@@ -24,14 +24,8 @@ class Module
                 },
             ),
             'factories' => array(
-                'qu_chat_model' => function ($sm) {
-                    $config = $sm->get('Config');
-                    return new \QuAdmin\Options\QuAdminModelOptions($config['qu_chat_model']);
-                },
                 'qu_chat_mapper' =>  function($sm) {
-                    $QuWebDemoMapper =  new \QuChat\Model\ChatMapper();
-                    $QuWebDemoMapper->setQuAdminModelOptions($sm->get('qu_chat_model'));
-                    return $QuWebDemoMapper;
+                    return  new \QuChat\Mapper\QuChatMapper();
                 },
             )
         );
