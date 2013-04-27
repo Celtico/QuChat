@@ -26,7 +26,8 @@ class QuChatNoData implements MessageComponentInterface {
         $data =  array(
             'type'           => 'onOpen',
             'id_resource'    => $conn->resourceId,
-            'clients'        => $clients
+            'clients'        => $clients,
+            'usersCount'    =>  count($this->clients)
         );
 
         $conn->send(json_encode($data));
@@ -96,7 +97,7 @@ class QuChatNoData implements MessageComponentInterface {
             if($id_resource_parent == $client->resourceId){
                 $data =  array(
                     'type'      => 'onMessage',
-                    'date'      => $this->dateFormat(date("Y-m-d H:i:s")),
+                    'date'      => '',
                     'name'      => $name,
                     'message'   => $message
                 );
@@ -106,6 +107,7 @@ class QuChatNoData implements MessageComponentInterface {
                 return true;
             }
         }
+        //$this->dateFormat(date("Y-m-d H:i:s"))
         return false;
     }
     /**
@@ -126,7 +128,7 @@ class QuChatNoData implements MessageComponentInterface {
 
                 $data =  array(
                     'type'      => 'onMessage',
-                    'date'      => $this->dateFormat(date("Y-m-d H:i:s")),
+                    'date'      => '',
                     'name'      => $name,
                     'message'   => $message
                 );

@@ -2,9 +2,12 @@
 
 namespace QuChat\Server;
 
+
 use QuChat\Mapper\QuChatMapper;
+use Zend\Db\Adapter\Adapter;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
+use Zend\Db\Adapter\Driver\Pdo\Pdo;
 
 class QuChatData implements MessageComponentInterface {
 
@@ -15,6 +18,16 @@ class QuChatData implements MessageComponentInterface {
 
         $this->db      = new QuChatMapper();
         $this->clients = new \SplObjectStorage;
+
+        $this->db->setDbAdapter(new Adapter(array(
+            'driver'         => 'Pdo_Mysql',
+            'hostname'       => 'localhost',
+            'dbname'         => 'qumodules',
+            'username'       => 'root',
+           'password'       => 'estacio8'
+        )));
+
+
     }
     public function onOpen(ConnectionInterface $conn){
 

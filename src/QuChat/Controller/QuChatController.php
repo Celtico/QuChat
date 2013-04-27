@@ -19,16 +19,6 @@ class QuChatController extends AbstractActionController
     protected $name;
 
     public function indexAction(){}
-
-    public function listAction()
-    {
-        $qu_chat_model = $this->getServiceLocator()->get('qu_chat_mapper');
-        $model = new ViewModel();
-        $model->setVariables(array(
-                'listUsers'=> $qu_chat_model->getAll(array('type'=>'listUsers'))));
-        $model->setTemplate('qu-chat/qu-chat/list');
-        return  $model->setTerminal(true);
-    }
     public function messagesAction()
     {
         $id = $this->getEvent()->getRouteMatch()->getParam('id',0);
@@ -43,27 +33,37 @@ class QuChatController extends AbstractActionController
 
 
 
-    public function openAction()
-    {
-        $post = $this->getEvent()->getRequest()->getPost();
-        $this->getUser($post['id_resource']);
-        $this->insertNewUser($post['id_resource']);
-        $this->saveListUsers($post['clients']);
-        $model = new ViewModel();
-        return  $model->setTerminal(true);
-    }
-
-    public function messageAction()
+    public function listAction()
     {
         $post = $this->getEvent()->getRequest()->getPost();
 
-        $this->getUser($post['id_user']);
-        $this->saveMessageUser($post['id_resource_parent'],$post['message']);
+        if(isset($post['id_user']))     $this->id_user = $post['id_user'];
+        if(isset($post['name']))        $this->name    = $post['name'];
+
+
+        if(isset($post['id_resource'])){
+            $id_resource = $post['id_resource'];
+        }else{
+            $id_resource = '';
+        }
+
+        if(isset($post['clients'])){
+            $clients = $post['clients'];
+        }else{
+            $clients = '';
+        }
+
+        $this->insertNewUser($id_resource);
 
         $model = new ViewModel();
-        return  $model->setTerminal(true);
-    }
+        $model->setVariables(array(
+            'listUsers'=> $this->saveListUsers($clients)
+        ));
 
+        $model->setTemplate('qu-chat/qu-chat/list');
+        return  $model->setTerminal(true);
+
+    }
 
     /**
      * @param $id_resource
@@ -71,17 +71,26 @@ class QuChatController extends AbstractActionController
      */
     protected function insertNewUser($id_resource){
 
-        $this->db = $this->getServiceLocator()->get('qu_chat_mapper');
+        if($id_resource){
 
-        $data =  array(
-            'id_user'    =>$this->id_user,
-            'name'       =>$this->name ,
-            'message'    => 'updateNewUser',
-            'id_resource'=> $id_resource,
-            'date'=>date("Y-m-d H:i:s")
-        );
+            $this->db = $this->getServiceLocator()->get('qu_chat_mapper');
 
-        return $this->db->onInsert($data);
+            $data =  array(
+                'id_user'     => $this->id_user,
+                'name'        => $this->name ,
+                'type'        => 'insertNewUser',
+                'message'     => $_SERVER['REMOTE_ADDR'],
+                'id_resource' => $id_resource,
+                'date'        => date("Y-m-d H:i:s")
+            );
+
+            return $this->db->onInsert($data);
+
+        }else{
+
+            return false;
+
+        }
     }
 
 
@@ -97,34 +106,65 @@ class QuChatController extends AbstractActionController
 
         $this->db = $this->getServiceLocator()->get('qu_chat_mapper');
 
-        $users = array();
-        $clients = explode(',',str_replace(',|','',$clients.'|'));
-        foreach($clients as $client){
+        if($clients){
 
-            $data =  array( 'id_resource'=>$client );
-            $this->db->where($data);
-            $this->db->Order('id_chat desc');
-            $row = $this->db->row();
-            $users[] = array(
-                'id_user'       =>$row['id_user'],
-                'id_resource'   =>$row['id_resource'],
-                'type'          =>'listUsers',
-                'date'          =>date("Y-m-d H:i:s"),
-                'name'          =>$row['name'],
-                'message'       =>'listUsers',
+            $users = array();
+            $clients = explode(',',str_replace(',|','',$clients.'|'));
+            foreach($clients as $client){
 
-            );
+                $this->db->where(array('id_resource'=>$client));
+
+                $this->db->Order('id_chat desc');
+
+                $row = $this->db->row();
+
+                if($row['id_resource'] == '')  $row['id_resource'] =  $client;
+                if($row['id_user'] == '')      $row['id_user'] =      $client;
+                if($row['name'] == '')         $row['name'] =         $client;
+
+                    $users[] = array(
+                        'id_user'       => $row['id_user'],
+                        'id_resource'   => $row['id_resource'],
+                        'type'          => 'listUsers',
+                        'date'          => date("Y-m-d H:i:s"),
+                        'name'          => $row['name'],
+                        'message'       => $row['message'],
+                    );
+
+            }
+
+            //$this->db->onRemove(array('type'=>'insertNewUser'));
+            $this->db->onRemove(array('type'=>'listUsers'));
+
+            foreach($users as $user){
+                $this->db->onInsert($user);
+            }
+
+            return $this->db->getAll(array('type'=>'listUsers'));
+
+        }else{
+
+            return $this->db->getAll(array('type'=>'listUsers'));
+
         }
 
-        $this->db->onRemove(array('message'=>'updateNewUser'));
-        $this->db->onRemove(array('type'=>'listUsers'));
-
-        foreach($users as $user){
-            $this->db->onInsert($user);
-        }
-        return true;
     }
 
+
+
+
+
+
+    public function messageAction()
+    {
+        $post = $this->getEvent()->getRequest()->getPost();
+
+        $this->id_user = $post['id_user'];
+        $this->saveMessageUser($post['id_resource_parent'],$post['message']);
+
+        $model = new ViewModel();
+        return  $model->setTerminal(true);
+    }
 
     /**
      * onMessage
@@ -139,26 +179,26 @@ class QuChatController extends AbstractActionController
 
         $this->db = $this->getServiceLocator()->get('qu_chat_mapper');
 
-        $user        = $this->db->getRow(array('id_user'=>$this->id_user));
+        $user        = $this->db->getRow(array('id_user'=>$this->id_user,'type'=>'listUsers'));
         $user_parent = $this->db->getRow(array('id_resource'=>$id_resource_parent));
 
         $data =  array(
 
 
-            'id_user'               =>$this->id_user,
-            'name'                  =>$this->name ,
-            'id_resource'           =>$user['id_resource'],
+            'id_user'               => $user['id_user'],
+            'name'                  => $user['name'] ,
+            'id_resource'           => $user['id_resource'],
 
 
-            'id_user_parent'        =>$user_parent['id_user'],
-            'id_resource_parent'    =>$user_parent['id_resource'],
-            'name_parent'           =>$user_parent['name'],
+            'id_user_parent'        => $user_parent['id_user'],
+            'id_resource_parent'    => $user_parent['id_resource'],
+            'name_parent'           => $user_parent['name'],
 
 
-            'type'                  =>'onMessage',
+            'type'                  => 'onMessage',
 
             'date'=>                date("Y-m-d H:i:s"),
-            'message'               =>$message,
+            'message'               => $message,
 
         );
 
@@ -166,22 +206,4 @@ class QuChatController extends AbstractActionController
 
         return true;
     }
-
-    public function getUser($id_resource)
-    {
-        $zfcUser =  $this->getServiceLocator()->get('zfcuser_auth_service')->getIdentity();
-
-        if(method_exists($zfcUser,'getId'))
-        {
-            $this->id_user = $zfcUser->getId();
-            $this->name    = $zfcUser->getDisplayName();
-
-        }else{
-
-            $this->id_user = $id_resource;
-            $this->name    = $id_resource;
-        }
-        return $this;
-    }
-
 }

@@ -8,6 +8,7 @@
 namespace QuChat;
 
 use QuChat\Db\Adapter\DbAdapterAwareInterface;
+use Zend\Db\Adapter\Adapter;
 
 class Module
 {
@@ -18,8 +19,19 @@ class Module
             'initializers' => array(
                 function($instance, $sm){
                     if($instance instanceof DbAdapterAwareInterface){
-                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                        $instance->setDbAdapter($dbAdapter);
+
+
+
+                                                $instance->setDbAdapter(new Adapter(array(
+                                                    'driver'         => 'Pdo_Mysql',
+                                                    'hostname'       => 'localhost',
+                                                    'dbname'         => 'qumodules',
+                                                    'username'       => 'root',
+                                                    'password'       => 'estacio8'
+                                                )));
+
+
+
                     }
                 },
             ),
