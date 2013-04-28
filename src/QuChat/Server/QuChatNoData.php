@@ -37,112 +37,78 @@ class QuChatNoData implements MessageComponentInterface {
 
         list($typeMessage,$name,$id_resource_parent,$message) = explode('|',$msg);
 
+        $send = false;
+
         if($typeMessage == 'onOpen'){
 
-           $this->sendNewUsers($this->clients);
+            $send = false;
+
+            foreach($this->clients as $client){
+
+                $data =  array(
+                    'type'=>'listUsers',
+                    'usersCount' => count($this->clients),
+                );
+
+                $client->send(json_encode($data));
+                $send = true;
+            }
+
 
         }elseif($typeMessage == 'onMessage'){
 
-            $sendMessageOneUser = $this->sendMessageOneUser($this->clients,$from,$name,$message,$id_resource_parent);
+            $send = false;
 
-            if(!$sendMessageOneUser){
+            foreach($this->clients as $client){
+                if($id_resource_parent == $client->resourceId){
+                    $data =  array(
+                        'type'      => 'onMessage',
+                        'date'      => '',
+                        'name'      => $name,
+                        'message'   => $message
+                    );
+                    if($from !== $client){
 
-               $this->sendMessageToUsers($this->clients,$from,$name,$message);
-            }
-        }
-    }
-
-
-
-
-    /*SEND*/
-
-
-
-
-    /**
-     * onOpen
-     *
-     * Send New Users
-     *
-     * @param $clients
-     * @return bool
-     */
-    protected function sendNewUsers($clients){
-
-        foreach($clients as $client){
-            $data =  array(
-                'type'=>'listUsers',
-                'usersCount' => count($clients),
-            );
-            $client->send(json_encode($data));
-        }
-        return true;
-    }
-    /**
-     * onMessage
-     *
-     * Send Message One User
-     *
-     * @param $clients
-     * @param $from
-     * @param $name
-     * @param $message
-     * @param $id_resource_parent
-     * @return bool
-     */
-    protected function sendMessageOneUser($clients,$from,$name,$message,$id_resource_parent) {
-
-        foreach($clients as $client){
-            if($id_resource_parent == $client->resourceId){
-                $data =  array(
-                    'type'      => 'onMessage',
-                    'date'      => '',
-                    'name'      => $name,
-                    'message'   => $message
-                );
-                if($from !== $client){
-                    $client->send(json_encode($data));
+                        $client->send(json_encode($data));
+                        $send = true;
+                    }
                 }
-                return true;
+            }
+
+            if(!$send){
+
+                $send = false;
+
+                foreach($this->clients as $client){
+
+                    if($from !== $client){
+                        $data =  array(
+                            'type'      => 'onMessage',
+                            'date'      => '',
+                            'name'      => $name,
+                            'message'   => $message
+                        );
+
+                        $client->send(json_encode($data));
+                        $send = true;
+                    }
+                }
             }
         }
-        //$this->dateFormat(date("Y-m-d H:i:s"))
-        return false;
-    }
-    /**
-     * onMessage
-     *
-     * Send Message To Users
-     *
-     * @param $clients
-     * @param $from
-     * @param $name
-     * @param $message
-     * @return bool
-     */
-    protected function sendMessageToUsers($clients,$from,$name,$message) {
 
-        foreach($clients as $client){
-            if($from !== $client){
-
-                $data =  array(
-                    'type'      => 'onMessage',
-                    'date'      => '',
-                    'name'      => $name,
-                    'message'   => $message
-                );
-                $client->send(json_encode($data));
-            }
+        if(!$send){
+            $data =  array(
+                'type'      => 'onMessage',
+                'date'      => '',
+                'name'      =>  $from->resourceId,
+                'message'   => ':)'
+            );
+            $from->send(json_encode($data));
         }
-        return true;
+
+
     }
 
-
-
-    protected function dateFormat($date){
-        return strftime("%k:%M:%S", strtotime($date));
-    }
 
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
